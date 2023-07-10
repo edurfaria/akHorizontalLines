@@ -7,6 +7,8 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import kotlin.math.max
+import kotlin.math.min
 
 class Canvas(context: Context, attrs: AttributeSet) : View(context, attrs) {
     // Coordinates for the dot (Circle)
@@ -58,13 +60,31 @@ class Canvas(context: Context, attrs: AttributeSet) : View(context, attrs) {
         invalidate() // Invalidate the view to trigger a redraw
     }
 
-    fun drawRectangle(x: Float, y: Float, scale: Int =2) {
+    fun drawRectangle(x: Float, y: Float, scale: Int = 2) {
+        val containerWidth = width.toFloat()
+        val containerHeight = height.toFloat()
+        Log.d("Box", "width:$containerWidth - height:$containerHeight")
+
+        val centerX = x - ((containerWidth / scale) / 2)
+        val centerY = y - ((containerHeight / scale) / 2)
+
+        val maxX = containerWidth - (containerWidth / scale)
+        val maxY = containerHeight - (containerHeight / scale)
+
+        val boundedX = min(max(centerX, 0f), maxX)
+        val boundedY = min(max(centerY, 0f), maxY)
+
+        val left = boundedX
+        val top = boundedY
+        val right = boundedX + (containerWidth / scale)
+        val bottom = boundedY + (containerHeight / scale)
+
         this.x = x
         this.y = y
-        this.rectangleLeft = x
-        this.rectangleTop = y
-        this.rectangleRight = x + (width/scale)
-        this.rectangleBottom = y + (height/scale)
+        this.rectangleLeft = left
+        this.rectangleTop = top
+        this.rectangleRight = right
+        this.rectangleBottom = bottom
         this.isRectangleVisible = true
         invalidate() // Invalidate the view to trigger a redraw
     }
