@@ -58,13 +58,13 @@ class Canvas(context: Context, attrs: AttributeSet) : View(context, attrs) {
         invalidate() // Invalidate the view to trigger a redraw
     }
 
-    fun drawRectangle(x: Float, y: Float) {
+    fun drawRectangle(x: Float, y: Float, scale: Int =2) {
         this.x = x
         this.y = y
         this.rectangleLeft = x
         this.rectangleTop = y
-        this.rectangleRight = x + width
-        this.rectangleBottom = y + height
+        this.rectangleRight = x + (width/scale)
+        this.rectangleBottom = y + (height/scale)
         this.isRectangleVisible = true
         invalidate() // Invalidate the view to trigger a redraw
     }
