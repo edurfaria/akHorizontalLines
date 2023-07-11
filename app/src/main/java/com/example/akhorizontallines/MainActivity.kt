@@ -7,6 +7,7 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.SystemClock
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -88,11 +89,18 @@ class MainActivity : AppCompatActivity() {
 
 
         when {
+
+            (translateX != 0.0F) -> {
+                this.translateY = binding.sHorizontal.translationY
+                val x = translateX
+                val y = translateY
+                binding.sText.text = "3º Stage -> $x $y "
+                thirdStage(x, y)
+            }
             (workingX && !workingY) -> {
                 workingX = false
                 workingY = true
                 translateX = binding.sVertical.translationX
-                binding.sVertical.translationX = translateX
                 binding.sHorizontal.show()
                 binding.sText.text = "2º Stage"
                 secondStage(rectangleTop, rectangleBottom)
@@ -120,6 +128,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun thirdStage(x: Float, y: Float) {
+        Log.d("Debug", "//Starting 3º Stage... $x $y")
+        simulateTouch(x, y)
+        workingY = false
+        workingX = false
+        this.animateX.cancel()
+        this.animateY.cancel()
+        translateY = 0.0F
+        translateX = 0.0F
+    }
+
     /**
      * secondStage
      * @description Call animation on sHorizontal View
@@ -130,7 +149,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun secondStage(from: Float, to: Float) {
         Log.d("Debug", "//Starting 2º Stage...")
-
+        this.animateX.pause()
         this.animateY = animateViewFromTopToBottom(
             binding.sHorizontal,
             duration,
@@ -140,6 +159,9 @@ class MainActivity : AppCompatActivity() {
         ) {
             Log.d("Animation", "Animation Y ended")
             workingY = false
+            binding.canvas.clearRectangle()
+            binding.sVertical.hide()
+            binding.sHorizontal.hide()
         }
         this.animateY.start()
     }
@@ -163,6 +185,8 @@ class MainActivity : AppCompatActivity() {
         ) {
             Log.d("Animation", "Animation X ended")
             workingX = false
+            binding.canvas.clearRectangle()
+            binding.sVertical.hide()
         }
         this.animateX.start()
     }
@@ -214,7 +238,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnBotRight.prepButton(clickable)
     }
 
-    private fun Button.prepButton(isClickable: Boolean) {
+    private fun Button.prepButton(isClickable: Boolean=false) {
         this.setOnClickListener { setMessage(this.text.toString()) } //callback
         this.isClickable = isClickable
         this.background = null //remove ripple effect
@@ -311,4 +335,41 @@ class MainActivity : AppCompatActivity() {
         return animator
         //animator.start()
     }
+
+    private fun simulateTouch(x: Float, y: Float) {
+        //Enabling Buttons
+        binding.btnTopLeft.prepButton(true)
+        binding.btnTopMid.prepButton(true)
+        binding.btnTopRight.prepButton(true)
+        binding.btnBotLeft.prepButton(true)
+        binding.btnBotMid.prepButton(true)
+        binding.btnBotRight.prepButton(true)
+
+        Log.d("Debug", "//simulateTouch at $x $y")
+        binding.root.isClickable = false
+        val down = SystemClock.uptimeMillis()
+        var event = SystemClock.uptimeMillis() + 50
+
+        val pressDown = MotionEvent.obtain(
+            down, event, MotionEvent.ACTION_DOWN, x, y, 0
+        )
+        binding.root.dispatchTouchEvent(pressDown)
+
+        event = SystemClock.uptimeMillis() + 50
+
+        val pressUp = MotionEvent.obtain(
+            down, event, MotionEvent.ACTION_UP, x, y, 0
+        )
+
+        binding.root.dispatchTouchEvent(pressUp)
+        //Disabling Buttons
+        binding.btnTopLeft.prepButton()
+        binding.btnTopMid.prepButton()
+        binding.btnTopRight.prepButton()
+        binding.btnBotLeft.prepButton()
+        binding.btnBotMid.prepButton()
+        binding.btnBotRight.prepButton()
+        binding.root.isClickable = true
+    }
+
 }
