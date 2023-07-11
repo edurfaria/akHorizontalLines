@@ -122,6 +122,17 @@
             android:text="Hello World!" />
     </LinearLayout>
 
+    <View
+        android:id="@+id/sHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@android:color/holo_blue_bright" />
+
+    <View
+        android:id="@+id/sVertical"
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/holo_red_light" />
 
     <com.example.akhorizontallines.Canvas
         android:id="@+id/canvas"
